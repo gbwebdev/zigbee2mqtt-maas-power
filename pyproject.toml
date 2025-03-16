@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "zigbee2mqtt_maas_power"
+version = "0.1.0"
+description = "A REST-to-MQTT gateway to manage servers power from Canonical MAAS using Zigbee2MQTT"
+authors = [
+  { name = "Guillaume BITON", email = "guillaume@gbweb.fr" }
+]
+#license = "MIT"
+license =  {text = "MIT License"}
+dependencies = [
+  "pyyaml >= 6.0",
+  "paho-mqtt",
+  "Flask-API"
+]
+
+# Optional
+keywords = ["api", "maas", "zigbee", "mqtt"]
+
+# This is where we define the console script so users can run `my-tool` directly.
+[project.scripts]
+run-server = "zigbee2mqtt_maas_power.main:main"
