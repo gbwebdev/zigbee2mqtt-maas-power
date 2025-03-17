@@ -1,0 +1,32 @@
+mqtt:
+  base_topic: zigbee2mqtt
+  server: 'mqtt://localhost'
+  ca_cert: '/etc/zigbee2mqtt_maas_power/ssl/ca.crt'
+  username: 'mqtt_user'
+  password: 'mqtt_password'
+  cert: '/etc/zigbee2mqtt_maas_power/ssl/mqtt_client.crt'
+  key: '/etc/zigbee2mqtt_maas_power/ssl/mqtt_client.key'
+
+pdus:
+  lab-pdu-1:
+    invert: false # Set to true if working with Normally Closed (NC) devices
+    set_state_topic: 'lab-pdu-1/set/state_l{{ switch_id }}'
+    read_state_topic: 'lab-pdu-1'
+    read_state_payload_key: 'state_l{{ switch_id }}'
+  lab-pdu-2:
+    invert: false # Set to true if working with Normally Closed (NC) devices
+    set_state_topic: 'lab-pdu-2/set/state_l{{ switch_id }}'
+    read_state_topic: 'lab-pdu-2'
+    read_state_payload_key: 'state_l{{ switch_id }}'
+
+nodes:
+  node1:
+    pdu: lab-pdu-1
+    switch_id: 1
+    power_on_extra_probe:
+      ping: 192.168.1.1
+  node2:
+    pdu: lab-pdu-1
+    switch_id: 2
+    power_on_extra_probe:
+      ping: 192.168.1.2
