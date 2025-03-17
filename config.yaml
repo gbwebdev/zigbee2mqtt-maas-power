@@ -1,6 +1,7 @@
 mqtt:
+  server: 'localhost'
+  port: 1883
   base_topic: zigbee2mqtt
-  server: 'mqtt://localhost'
   ca_cert: '/etc/zigbee2mqtt_maas_power/ssl/ca.crt'
   username: 'mqtt_user'
   password: 'mqtt_password'

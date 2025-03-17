@@ -7,6 +7,7 @@ class Singleton(type):
 
 import yaml
 import os
+from jinja2 import nativetypes
 
 class Config(metaclass=Singleton):
     # Define the configuration properties
@@ -16,8 +17,10 @@ class Config(metaclass=Singleton):
 
         def __init__(self, config: dict, args):
             # Set default values for MQTT configuration properties then load the configuration
-            self._ca_cert = "/etc/zigbee2mqtt_maas_power/ssl/ca.crt"
             self._server = "mqtt://localhost"
+            self._port = 1883
+            self._base_topic = "zigbee2mqtt"
+            self._ca_cert = "/etc/zigbee2mqtt_maas_power/ssl/ca.crt"
             self._username = None
             self._password = None
             self._cert = "/etc/zigbee2mqtt_maas_power/ssl/client.crt"
@@ -32,18 +35,31 @@ class Config(metaclass=Singleton):
             # 3. Configuration file
             # 4. Default values
 
+            if args.mqtt_server:
+                self._server = args.mqtt_server
+            else:
+                self._server = os.environ.get('ZMP_MQTT_SERVER',
+                                              config.get('server',
+                                                          self._server))
+            if args.mqtt_port:
+                self._port = args.mqtt_port
+            else:
+                self._port = os.environ.get('ZMP_MQTT_PORT',
+                                            config.get('port',
+                                                          self._port))
+            if args.mqtt_base_topic:
+                self._base_topic = args.mqtt_base_topic
+            else:
+                self._base_topic = os.environ.get('ZMP_MQTT_BASE_TOPIC',
+                                                  config.get('base_topic',
+                                                             self._base_topic))
+
             if args.mqtt_ca_cert:
                 self._ca_cert = args.mqtt_ca_cert
             else:
                 self._ca_cert = os.environ.get('ZMP_MQTT_CA_CERT',
                                                config.get('ca_cert',
                                                           self._ca_cert))
-            if args.mqtt_server:
-                self._server = args.mqtt_server
-            else:
-                self._server = os.environ.get('ZMP_MQTT_SERVER',
-                                               config.get('server',
-                                                          self._server))
             if args.mqtt_username:
                 self._username = args.mqtt_username
             else:
@@ -68,16 +84,26 @@ class Config(metaclass=Singleton):
                 self._key = os.environ.get('ZMP_MQTT_KEY',
                                            config.get('key',
                                                       self._key))
+
+        @property
+        def base_topic(self):
+            # Return the base topic
+            return self._base_topic
+
+        @property
+        def server(self):
+            # Return the MQTT server URL
+            return self._server
+
+        @property
+        def port(self):
+            # Return the MQTT server port
+            return self._port
         
         @property
         def ca_cert(self):
             # Return the CA certificate path
             return self._ca_cert
-        
-        @property
-        def server(self):
-            # Return the MQTT server URL
-            return self._server
         
         @property
         def username(self):
@@ -156,6 +182,24 @@ class Config(metaclass=Singleton):
         def power_on_extra_probe(self):
             return self._power_on_extra_probe
 
+        @property
+        def set_state_topic(self):
+            return nativetypes.NativeEnvironment() \
+                    .from_string(self._pdu.set_state_topic) \
+                    .render(switch_id=self._switch_id)
+
+        @property
+        def read_state_topic(self):
+            return nativetypes.NativeEnvironment() \
+                    .from_string(self._pdu.read_state_topic) \
+                    .render(switch_id=self._switch_id)
+        
+        @property
+        def read_state_payload_key(self):
+            return nativetypes.NativeEnvironment() \
+                    .from_string(self._pdu.read_state_payload_key) \
+                    .render(switch_id=self._switch_id)
+        
         def load(self, config, pdus):
             self._pdu = pdus.get(config.get('pdu'))
             self._switch_id = config.get('switch_id')
