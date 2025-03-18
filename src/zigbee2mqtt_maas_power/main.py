@@ -1,8 +1,11 @@
 import argparse
 import sys
 
+from flask_api import FlaskAPI
+
 from zigbee2mqtt_maas_power.config import Config
 from zigbee2mqtt_maas_power.mqtt import Mqtt
+from zigbee2mqtt_maas_power.node import Node
 
 def on_publish(client, userdata, mid, reason_code, properties):
     # reason_code and properties will only be present in MQTTv5. It's always unset in MQTTv3
@@ -46,19 +49,29 @@ def main():
     print("Running")
     print(config.mqtt.server)
 
+    # Create the MQTT client
+    mqtt = Mqtt(config.mqtt)
+
+    # mqtt.publish("test", "Hello, world!")
+
+    nodes = {}
+
     for node_name, node_conf in config.nodes.items():
         print(node_name)
         print(node_conf.set_state_topic)
         print(node_conf.read_state_topic)
         print(node_conf.read_state_payload_key)
-
-
-    # Create the MQTT client
-    mqtt = Mqtt(config.mqtt)
-
-    mqtt.publish("test", "Hello, world!")
-
+        node = Node(node_conf, mqtt)
+        nodes[node_name] = node
+        # mqtt.s
     # Return exit code 0 for success
+    
+    
+    app = FlaskAPI(__name__)
+    
+    
+    mqtt._client.loop_forever()
+    
     sys.exit(0)
 
 if __name__ == "__main__":

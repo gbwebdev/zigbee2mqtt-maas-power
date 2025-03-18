@@ -22,6 +22,8 @@ class Mqtt(metaclass=Singleton):
         self._handle_auth(config)
         self._client.connect(config.server, config.port)
         self._client.loop_start()
+        
+        
     
     def _handle_tls(self, config: Config.Mqtt):
         ca_cert = config.ca_cert
@@ -50,7 +52,7 @@ class Mqtt(metaclass=Singleton):
         return True
 
 
-    def on_publish(self, client, userdata, mid,  reason_code, properties):
+    def on_publish(self, client, userdata, mid,  reason_code=None, properties=None):
         # reason_code and properties will only be present in MQTTv5. It's always unset in MQTTv3
         try:
             userdata.remove(mid)
@@ -66,8 +68,14 @@ class Mqtt(metaclass=Singleton):
             print("The best solution to avoid race-condition is using the msg_info from publish()")
             print("We could also try using a list of acknowledged mid rather than removing from pending list,")
             print("but remember that mid could be re-used !")
+        except Exception as e:
+            print(e)
         try:
             print(userdata)
             print(reason_code)
         except Exception as e:
             print(e)
+    
+    def register_state_listener(self, topic, callback):
+        self._client.message_callback_add(topic, callback)
+        self._client.subscribe(topic)
