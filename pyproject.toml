@@ -15,7 +15,8 @@ dependencies = [
   "pyyaml >= 6.0",
   "paho-mqtt",
   "Flask-API",
-  "Jinja2"
+  "Jinja2",
+  "gunicorn"
 ]
 
 # Optional
@@ -23,4 +24,4 @@ keywords = ["api", "maas", "zigbee", "mqtt"]
 
 # This is where we define the console script so users can run `my-tool` directly.
 [project.scripts]
-run-server = "zigbee2mqtt_maas_power.main:main"
+zmp = "zigbee2mqtt_maas_power.main:cli"

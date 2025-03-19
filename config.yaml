@@ -1,12 +1,19 @@
 mqtt:
   server: 'localhost'
   port: 1883
+  connect_timeout: 5 # in seconds
   base_topic: zigbee2mqtt
-  ca_cert: '/etc/zigbee2mqtt_maas_power/ssl/ca.crt'
-  username: 'mqtt_user'
-  password: 'mqtt_password'
-  cert: '/etc/zigbee2mqtt_maas_power/ssl/mqtt_client.crt'
-  key: '/etc/zigbee2mqtt_maas_power/ssl/mqtt_client.key'
+  tls:
+    enabled: true
+    ca_cert: '/etc/zigbee2mqtt_maas_power/ssl/mqtt_ca.crt'            # CA certificate for TLS, only required if enabled
+    # client_cert: '/etc/zigbee2mqtt_maas_power/ssl/mqtt_client.crt'  # For TLS authentication, requires tls to be enabled, ca_cert and client_key to be defined
+    # client_key: '/etc/zigbee2mqtt_maas_power/ssl/mqtt_client.key'   # For TLS authentication, requires tls to be enabled, ca_cert and client_cert  to be defined
+  # username: 'mqtt_user'     # For MQTT authentication, requires password to be defined
+  # password: 'mqtt_password' # For MQTT authentication, requires password to be defined
+
+http_server:
+  port: 5083
+  address: "0.0.0.0"
 
 pdus:
   lab-pdu-1:
@@ -24,6 +31,8 @@ nodes:
   node1:
     pdu: lab-pdu-1
     switch_id: 1
+    # power_off_pre_steps:
+    #   ssh_shutdown: true
     power_on_extra_probe:
       ping: 192.168.1.1
   node2:
