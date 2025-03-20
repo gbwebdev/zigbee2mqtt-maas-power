@@ -17,7 +17,7 @@ class Config(metaclass=Singleton):
 
         def __init__(self, config: dict, args):
             # Set default values for MQTT configuration properties then load the configuration
-            self._server = "mqtt://localhost"
+            self._server = "localhost"
             self._port = 1883
             self._connect_timeout = 5
             self._base_topic = "zigbee2mqtt"
