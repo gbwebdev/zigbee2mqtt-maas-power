@@ -1,3 +1,13 @@
+import os
+import time
+import paho.mqtt.client as mqtt
+import ssl
+import logging
+
+from zigbee2mqtt_maas_power.config import Config
+
+logger = logging.getLogger()
+
 class Singleton(type):
     _instances = {}
     def __call__(cls, *args, **kwargs):
@@ -5,12 +15,6 @@ class Singleton(type):
             cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
 
-import os
-import time
-import paho.mqtt.client as mqtt
-import ssl
-
-from zigbee2mqtt_maas_power.config import Config
 
 class Mqtt(metaclass=Singleton):
     
@@ -34,45 +38,45 @@ class Mqtt(metaclass=Singleton):
                 break
 
         if not self._client.is_connected():
-            print("Failed to connect to MQTT broker")
+            logger.error("Failed to connect to MQTT broker")
             exit(1)
                                      
         
     
     def _handle_tls(self, config: Config.Mqtt):
         if config.tls:
-            print("TLS enabled for MQTT")
+            logger.info("TLS enabled for MQTT")
             ca_cert = config.ca_cert
             cert = config.client_cert
             key = config.client_key
             if os.path.isfile(ca_cert):
-                print("Found CA certificate")
+                logger.info("Found CA certificate")
                 if os.path.isfile(cert) and os.path.isfile(key):
-                    print("Found client certificate and key : will continue with mtls authentication")
+                    logger.info("Found client certificate and key : will continue with mtls authentication")
                     self._client.tls_set(ca_cert, cert, key, ssl.CERT_REQUIRED, ssl.PROTOCOL_TLSv1_2)
                 else:
-                    print("Client certificate and key not found, will try simple TLS connection (no mtls)")
+                    logger.info("Client certificate and key not found, will try simple TLS connection (no mtls)")
                     self._client.tls_set(ca_cert, ssl.PROTOCOL_TLSv1_2)
             else:
-                print("No CA certificate found, will try with system's CA certificates")
+                logger.info("No CA certificate found, will try with system's CA certificates")
                 self._client.tls_set()
         else:
-            print("TLS disabled for MQTT")
+            logger.info("TLS disabled for MQTT")
 
     def _handle_auth(self, config: Config.Mqtt):
         if config.username and config.password:
-            print("Username and password specified for MQTT, using password authentication")
+            logger.info("Username and password specified for MQTT, using password authentication")
             self._client.username_pw_set(config.username, config.password)
         else:
-            print("No username and password specified for MQTT, will try without password authentication")
+            logger.info("No username and password specified for MQTT, will try without password authentication")
 
     def publish(self, topic, payload, qos=0, retain=False):
-        print(f"Publishing to {topic}: {payload}")
+        logger.debug("Publishing to %s: %s", topic, payload)
         try:
             pub_res = self._client.publish(topic, payload, qos, retain)
             pub_res.wait_for_publish()
         except Exception as e:
-            print(e)
+            logger.error(e)
             return False
         return True
 
@@ -81,15 +85,15 @@ class Mqtt(metaclass=Singleton):
         try:
             userdata.remove(mid)
         except KeyError:
-            print("on_publish() is called with a mid not present in unacked_publish")
+            logger.warning("on_publish() is called with a mid not present in unacked_publish")
         except Exception as e:
-            print(e)
+            logger.error(e)
     
-    def _on_connect(client, userdata, flags, reason_code, properties):
-        print(f"Connected with result code {reason_code}")
+    def _on_connect(self, client, userdata, flags, reason_code, properties):
+        logger.info("Connected with result code %s", reason_code)
     
-    def _on_connect_fail(client, userdata, flags, reason_code, properties):
-        print(f"Connection failed with result code {reason_code}")
+    def _on_connect_fail(self, client, userdata, flags, reason_code, properties):
+        logger.error("Connection failed with result code  %s", reason_code)
         exit(1)
 
     def register_state_listener(self, topic, callback):

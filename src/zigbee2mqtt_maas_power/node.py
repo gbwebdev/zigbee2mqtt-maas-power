@@ -1,5 +1,9 @@
 import json
+import logging
+
 from zigbee2mqtt_maas_power.mqtt import Mqtt
+
+logger = logging.getLogger()
 
 class Node:
     def __init__(self, node_conf, mqtt):
@@ -13,7 +17,7 @@ class Node:
         self._switch_id: None
         self._power_on_extra_probe: []
         self._power_state = None
-        print(f"Registering listenet to \"{self._read_state_topic}\"")
+        logger.debug("Registering listener to \"%s\"", self._read_state_topic)
         self._mqtt.register_state_listener(self._read_state_topic, self.on_read_state)
 
     @property
@@ -32,7 +36,7 @@ class Node:
 
     def on_read_state(self, payload):
         # Callback for when a new state is read on mqtt
-        print(f"Searching for {self._read_state_payload_key} in {payload}")
+        logger.info("Searching for %s in %s", self._read_state_payload_key, payload)
         payload = json.loads(payload)
         # Read the state from the payload
         if self._read_state_payload_key in payload:

@@ -1,13 +1,17 @@
+import yaml
+import os
+import logging
+from jinja2 import nativetypes
+
+logger = logging.getLogger()
+
 class Singleton(type):
     _instances = {}
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
             cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
-
-import yaml
-import os
-from jinja2 import nativetypes
+    
 
 class Config(metaclass=Singleton):
     # Define the configuration properties
@@ -95,7 +99,7 @@ class Config(metaclass=Singleton):
                 if os.path.isfile(client_cert):
                     self._client_cert = client_cert
                 else:
-                    print(f"Specified client certificate file {client_cert} not found")
+                    logger.info(f"Specified client certificate file {client_cert} not found")
                     exit(1)
 
             if args and args.mqtt_client_key:
@@ -107,7 +111,7 @@ class Config(metaclass=Singleton):
                 if os.path.isfile(client_key):
                     self._client_key = client_key
                 else:
-                    print(f"Specified client key file {client_key} not found")
+                    logger.info(f"Specified client key file {client_key} not found")
                     exit(1)
 
 
@@ -316,14 +320,14 @@ class Config(metaclass=Singleton):
                                                   self._conf_file_path)
 
         if not os.path.isfile(self._conf_file_path):
-            print(f"Configuration file {self._conf_file_path} not found")
-            print("Looking for a configuration file in the working directory")
+            logger.info(f"Configuration file {self._conf_file_path} not found")
+            logger.info("Looking for a configuration file in the working directory")
             if os.path.isfile('config.yaml'):
                 self._conf_file_path = 'config.yaml'
             elif os.path.isfile('config.yml'):
                 self._conf_file_path = 'config.yml'
             else:
-                print("No configuration file found in the working directory")
+                logger.error("No configuration file found in the working directory")
                 exit(1)
         
         # Load the configuration file
