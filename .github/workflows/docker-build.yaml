@@ -55,4 +55,4 @@ jobs:
           context: .
           push: true
           tags: |
-            gbwebdev/your-image-name:${{ env.TAGS }}
+            gbwebdev/zigbee2mqtt-maas-power:${{ env.TAGS }}
