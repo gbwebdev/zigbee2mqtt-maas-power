@@ -43,7 +43,7 @@ jobs:
           else
             # Fallback for other branches
             VERSION=${{ github.sha }}
-            TAGS="${VERSION}"
+            TAGS="${VERSION},latest-dev"
           fi
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "TAGS=$TAGS" >> $GITHUB_ENV
