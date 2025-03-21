@@ -20,9 +20,9 @@ class Mqtt(metaclass=Singleton):
     
     def __init__(self, config: Config.Mqtt):
         self._client = mqtt.Client()
-        self._client.on_connect = Mqtt._on_connect
-        self._client.on_connect_fail = Mqtt._on_connect_fail
-        self._client.on_publish = Mqtt._on_publish
+        self._client.on_connect = self._on_connect
+        self._client.on_connect_fail = self._on_connect_fail
+        self._client.on_publish = self._on_publish
 
         self._base_topic = config.base_topic
         self._topic_listeners = {}
@@ -78,7 +78,7 @@ class Mqtt(metaclass=Singleton):
             return False
         return True
 
-    def _on_publish(client, userdata, mid,  reason_code=None, properties=None):
+    def _on_publish(self, client, userdata, mid,  reason_code=None, properties=None):
         # reason_code and properties will only be present in MQTTv5. It's always unset in MQTTv3
         try:
             userdata.remove(mid)
@@ -87,10 +87,10 @@ class Mqtt(metaclass=Singleton):
         except Exception as e:
             logger.error(e)
     
-    def _on_connect(client, userdata, flags, reason_code, properties):
+    def _on_connect(self, client, userdata, flags, reason_code, properties=None):
         logger.info("Connected with result code %s", reason_code)
     
-    def _on_connect_fail(client, userdata, flags, reason_code, properties):
+    def _on_connect_fail(self, client, userdata, flags, reason_code, properties=None):
         logger.error("Connection failed with result code  %s", reason_code)
         exit(1)
 
