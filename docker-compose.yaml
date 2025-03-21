@@ -1,6 +1,6 @@
 services:
   zigbee2mqtt_maas_power:
-    image: gbwebdev/zigbee2mqtt-maas-power
+    image: gbwebdev/zigbee2mqtt-maas-power:v0.1.0
     container_name: zigbee2mqtt_maas_power
     ports:
       - "5000:5000"
