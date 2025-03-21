@@ -21,7 +21,10 @@ $ docker run \
     -p 5083:80 \
     gbwebdev/zigbee2mqtt-maas-power
 ```
-
+or, using `docker compose`:
+```console
+$ docker compose up
+```
 
 If you use a specific CA certificate and/or mTLS, you should mount them in the container.
 
@@ -35,6 +38,7 @@ $ docker run \
     -p 5083:80 \
     gbwebdev/zigbee2mqtt-maas-power
 ```
+(you can uncomment the corresponding line in the docker-compose file).
 
 ## Regular install
 
