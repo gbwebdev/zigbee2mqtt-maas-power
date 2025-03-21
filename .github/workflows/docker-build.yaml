@@ -38,12 +38,12 @@ jobs:
             TAGS="${VERSION},latest"
           elif [[ "${{ github.ref }}" == refs/heads/develop ]]; then
             # Use branch name and commit hash for develop
-            VERSION=develop-${{ github.sha }}
+            VERSION=develop-${{ github.sha }},latest-dev
             TAGS="${VERSION}"
           else
             # Fallback for other branches
             VERSION=${{ github.sha }}
-            TAGS="${VERSION},latest-dev"
+            TAGS="${VERSION}"
           fi
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "TAGS=$TAGS" >> $GITHUB_ENV
