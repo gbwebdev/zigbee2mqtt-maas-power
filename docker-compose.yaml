@@ -1,0 +1,10 @@
+services:
+  zigbee2mqtt_maas_power:
+    image: gbwebdev/zigbee2mqtt-maas-power
+    container_name: zigbee2mqtt_maas_power
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./config.yaml:/etc/zigbee2mqtt_maas_power/config.yaml:ro # Mount the config file as read-only
+    #  - ./ssl:/etc/zigbee2mqtt_maas_power/ssl:ro                 # Mount the SSL directory as read-only
+    restart: unless-stopped # Automatically restart the container unless stopped manually
